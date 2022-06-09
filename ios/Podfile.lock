@@ -625,12 +625,6 @@ PODS:
   - React-jsinspector (0.69.0-rc.6)
   - React-logger (0.69.0-rc.6):
     - glog
-  - react-native-safe-area-context (4.3.1):
-    - RCT-Folly
-    - RCTRequired
-    - RCTTypeSafety
-    - React
-    - ReactCommon/turbomodule/core
   - React-perflogger (0.69.0-rc.6)
   - React-RCTActionSheet (0.69.0-rc.6):
     - React-Core/RCTActionSheetHeaders (= 0.69.0-rc.6)
@@ -703,9 +697,6 @@ PODS:
     - React-jsi (= 0.69.0-rc.6)
     - React-logger (= 0.69.0-rc.6)
     - React-perflogger (= 0.69.0-rc.6)
-  - RNScreens (3.13.1):
-    - React-Core
-    - React-RCTImage
   - SocketRocket (0.6.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -762,7 +753,6 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
-  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -777,7 +767,6 @@ DEPENDENCIES:
   - React-rncore (from `../node_modules/react-native/ReactCommon`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RNScreens (from `../node_modules/react-native-screens`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -845,8 +834,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
-  react-native-safe-area-context:
-    :path: "../node_modules/react-native-safe-area-context"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -875,8 +862,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RNScreens:
-    :path: "../node_modules/react-native-screens"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -917,7 +902,6 @@ SPEC CHECKSUMS:
   React-jsiexecutor: ed108fa941c623dda1cf25b0487e506ae5cd597f
   React-jsinspector: 96a6f470b24a0918d6f207c55f9186ee6d987ab8
   React-logger: 4542bced257f3ef658671bbe354a27d76070bee9
-  react-native-safe-area-context: 6c12e3859b6f27b25de4fee8201cfb858432d8de
   React-perflogger: e3265731a720bfd153640721f0234e8167c49c2a
   React-RCTActionSheet: ea6a00519ba55aec249f940e388b95432478a70e
   React-RCTAnimation: 3896fcda72ab94404f77ea65710e702b0f044c3d
@@ -932,7 +916,6 @@ SPEC CHECKSUMS:
   React-rncore: 8c80a245ba0975d3f4a5a1913ea788962dbc4c6c
   React-runtimeexecutor: 2771ef006f731bb0286309c73c0d7ba95371d648
   ReactCommon: d6a7231176ff71a199b61048d02a69210db589a2
-  RNScreens: 40a2cb40a02a609938137a1e0acfbf8fc9eebf19
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 30757bd18db6ed14e9788f601e375a563f08d525
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a

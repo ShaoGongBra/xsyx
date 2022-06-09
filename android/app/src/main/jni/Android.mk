@@ -1,3 +1,6 @@
+# react-native-screens无法打包
+APP_ALLOW_MISSING_DEPS :=true
+
 THIS_DIR := $(call my-dir)
 
 include $(REACT_ANDROID_DIR)/Android-prebuilt.mk
