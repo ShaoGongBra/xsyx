@@ -697,6 +697,8 @@ PODS:
     - React-jsi (= 0.69.0-rc.6)
     - React-logger (= 0.69.0-rc.6)
     - React-perflogger (= 0.69.0-rc.6)
+  - RNCAsyncStorage (1.17.6):
+    - React-Core
   - SocketRocket (0.6.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -767,6 +769,7 @@ DEPENDENCIES:
   - React-rncore (from `../node_modules/react-native/ReactCommon`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -862,6 +865,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -916,6 +921,7 @@ SPEC CHECKSUMS:
   React-rncore: 8c80a245ba0975d3f4a5a1913ea788962dbc4c6c
   React-runtimeexecutor: 2771ef006f731bb0286309c73c0d7ba95371d648
   ReactCommon: d6a7231176ff71a199b61048d02a69210db589a2
+  RNCAsyncStorage: 466b9df1a14bccda91da86e0b7d9a345d78e1673
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 30757bd18db6ed14e9788f601e375a563f08d525
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a

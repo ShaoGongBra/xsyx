@@ -1,42 +1,126 @@
-import React from 'react'
-import { View, StyleSheet, TextInput } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { View, StyleSheet, TextInput, TouchableOpacity, Keyboard } from 'react-native'
 import { Text } from './Base'
+import { useUserInfo, request, user, getUserInfo } from '../utils'
 
 export const Login = ({ Home }) => {
-  return <View style={styles.mask}>
-    <View style={styles.login}>
-      <Text style={styles.title}>请登录</Text>
-      <TextInput style={styles.input} placeholderTextColor='#fff' maxLength={11} placeholder='手机号' keyboardType='numeric' />
-      <TextInput style={styles.input} placeholderTextColor='#fff' maxLength={4} placeholder='验证码' keyboardType='numeric' />
-    </View>
-  </View>
+
+  const userInfo = useUserInfo()
+
+  useEffect(() => {
+    if (userInfo.login) {
+      getUserInfo().then(res => {
+        user.set(res)
+      })
+    }
+  }, [userInfo])
+
+  const [post, setPost] = useState({
+    userName: '',
+    verificationCode: '',
+    msgId: ''
+  })
+
+  const [showCode, setShowCode] = useState(false)
+
+  const setUserName = useCallback(text => setPost(old => ({
+    ...old,
+    userName: text
+  })), [])
+
+  const setCode = useCallback(text => setPost(old => ({
+    ...old,
+    verificationCode: text
+  })), [])
+
+  useEffect(() => {
+    if (post.userName.length === 11) {
+      // 发送验证码
+      request({
+        demain: 'user.xsyxsc.com',
+        url: 'api/auth/auth/sendVerificationCode',
+        type: 'form',
+        method: 'POST',
+        data: { mobileNo: post.userName, scenes: 'LOGIN', item: 'XSYX_APP_MEMBER' }
+      }).then(({ msgId }) => {
+        setPost(old => ({
+          ...old,
+          msgId
+        }))
+        setShowCode(true)
+      })
+    } else {
+      setShowCode(false)
+    }
+  }, [post.userName])
+
+  useEffect(() => {
+    if (post.userName.length === 11 && post.verificationCode.length === 4) {
+      // 登录
+      request({
+        demain: 'user.xsyxsc.com',
+        url: 'api/auth/auth/manualLogin',
+        type: 'form',
+        method: 'POST',
+        data: {
+          loginMode: 'VERIFICATION_CODE',
+          item: 'XSYX_APP_MEMBER',
+          ...post
+        }
+      }).then(async ({ userKey }) => {
+        const info = await getUserInfo(userKey)
+        if (!info.storeInfo) {
+          // 未设置自提店铺
+          throw '请前往小程序设置自提店铺后重新登录'
+        }
+        user.set({
+          key: userKey,
+          ...info
+        })
+      })
+    }
+  }, [post])
+
+  return userInfo.login ?
+    <Home /> :
+    <TouchableOpacity style={styles.mask} activeOpacity={1} onPress={Keyboard.dismiss}>
+      <View style={styles.login}>
+        <Text style={styles.title}>登录</Text>
+        <View style={styles.inputLayout}>
+          <TextInput style={styles.input} onChangeText={setUserName} placeholderTextColor='#fff' maxLength={11} placeholder='手机号' keyboardType='numeric' />
+        </View>
+        {showCode && <View style={styles.inputLayout}>
+          <TextInput autoFocus style={styles.input} onChangeText={setCode} placeholderTextColor='#fff' maxLength={4} placeholder='验证码' keyboardType='numeric' />
+        </View>}
+      </View>
+    </TouchableOpacity>
 }
 
 const styles = StyleSheet.create({
   mask: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    right: 0,
+    ...StyleSheet.absoluteFill,
     zIndex: 100,
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: 'center'
   },
   login: {
     backgroundColor: '#2b2c30',
     width: '80%',
     padding: 20,
-    borderRadius: 3
+    borderRadius: 3,
+    marginTop: 150
   },
   title: {
     marginBottom: 10,
-    fontSize: 32
+    fontSize: 26
+  },
+  inputLayout: {
+    borderBottomColor: '#666',
+    borderBottomWidth: StyleSheet.hairlineWidth
   },
   input: {
     color: '#fff',
-    marginTop: 10,
-    borderBottomColor: '#666',
-    borderBottomWidth: 0.2
+    paddingTop: 0,
+    paddingBottom: 0,
+    height: 50
   }
 })

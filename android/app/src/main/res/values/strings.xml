@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">兴盛优选</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey"></string>
 </resources>
