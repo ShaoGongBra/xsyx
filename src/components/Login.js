@@ -13,7 +13,7 @@ export const Login = ({ Home }) => {
         user.set(res)
       })
     }
-  }, [userInfo])
+  }, [userInfo.login])
 
   const [post, setPost] = useState({
     userName: '',
