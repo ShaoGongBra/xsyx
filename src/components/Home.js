@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, SectionList, SafeAreaView, Image, TouchableOpacity } from 'react-native'
-import { request, strToDate, CountDown } from '../utils'
+import { request, strToDate, CountDown, toast } from '../utils'
 import { Text } from './Base'
 
 const Title = ({
@@ -20,7 +20,9 @@ const Title = ({
       } else {
         const timer = new CountDown()
         timer.onTime(setTimeText)
-        timer.onStop(() => onTimeEnd?.(startTime))
+        timer.onStop(() => {
+          onTimeEnd?.(startTime)
+        })
         timer.start(time + 0, 'H时M分S秒', true)
         return () => {
           timer.stop()
@@ -47,6 +49,7 @@ const Item = ({
   tmBuyStart,
   acId,
   sku,
+  prId,
   prType,
   eskuSn,
   onAdd,
@@ -56,9 +59,11 @@ const Item = ({
   const addCart = useCallback(() => {
     onAdd?.({
       tmBuyStart,
+      title: prName,
       pai: acId,
       q: ulimitQty,
       sku,
+      pi: prId,
       pt: prType,
       ess: eskuSn,
       tks: []
@@ -133,6 +138,7 @@ export const Home = () => {
       }).then(res => cate[index].data = res.cmsActivityColumnProductInfos)))
     }).then(res => {
       setList(cate)
+      console.log(JSON.stringify(cate, null, 2))
     }).finally(() => {
       setRefresh(false)
     })
@@ -161,43 +167,47 @@ export const Home = () => {
 
   const buy = useCallback(time => {
     // 找到要提交的商品
-    const itemList = cart.filter(item => item.tmBuyStart === time)
+    const itemList = cart.filter(item => item.tmBuyStart === time).map(({ tmBuyStart, ...item }) => item)
+    if (!itemList.length) {
+      return
+    }
 
     const { userInfo = {} } = global
     const { storeInfo = {} } = userInfo
+
+    const data = {
+      order: JSON.stringify({
+        ai: storeInfo.areaId,
+        ct: 'MINI_PROGRAM',
+        ot: 'CHOICE',
+        iv: 0,
+        // 下面三个是用户信息
+        un: userInfo.userName,
+        wn: userInfo.nickName,
+        wi: userInfo.headImgUrl,
+        // 下面是收货人
+        p: userInfo.mobileNo,
+        r: userInfo.nickName,
+        si: storeInfo.storeId,
+        // 商品列表
+        itemList,
+        // 验证码
+        tk: '',
+      })
+    }
+
     request({
       demain: 'trade.xsyxsc.com',
       url: 'tradeorder/order/create',
       method: 'POST',
       type: 'form',
-      data: {
-        order: JSON.stringify({
-          ai: userInfo.currentStoreId,
-          ct: 'MINI_PROGRAM',
-          ot: 'CHOICE',
-          iv: 0,
-          // 下面三个是用户信息
-          un: userInfo.userName,
-          wn: userInfo.nickName,
-          wi: userInfo.headImgUrl,
-          // 下面是收货人
-          p: userInfo.mobileNo,
-          r: userInfo.nickName,
-          si: storeInfo.storeId,
-          // 商品列表
-          itemList,
-          // 验证码
-          tk: '',
-        })
-      }
+      data
     }).then(() => {
+      toast('购买成功 请在10分钟内前往小程序支付')
       getData()
     }).finally(() => {
-      // 删除这个时间节点
-      setTimers(old => {
-        delete old[time]
-        return { ...old }
-      })
+      // 删除购物车数据
+      setCart(cart.filter(item => item.tmBuyStart !== time))
     })
   }, [cart, getData])
 

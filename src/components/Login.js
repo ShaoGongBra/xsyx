@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { View, StyleSheet, TextInput, TouchableOpacity, Keyboard } from 'react-native'
 import { Text } from './Base'
-import { useUserInfo, request, user, getUserInfo } from '../utils'
+import { useUserInfo, request, user, getUserInfo, toast, useRouter } from '../utils'
 
-export const Login = ({ Home }) => {
+export const Login = ({ Home, Category }) => {
 
   const userInfo = useUserInfo()
 
@@ -71,18 +71,21 @@ export const Login = ({ Home }) => {
         const info = await getUserInfo(userKey)
         if (!info.storeInfo) {
           // 未设置自提店铺
-          throw '请前往小程序设置自提店铺后重新登录'
+          toast('请前往小程序设置自提店铺后重新登录')
+        } else {
+          user.set({
+            key: userKey,
+            ...info
+          })
         }
-        user.set({
-          key: userKey,
-          ...info
-        })
       })
     }
   }, [post])
 
+  const { component: Page } = useRouter()
+
   return userInfo.login ?
-    <Home /> :
+    <Page /> :
     <TouchableOpacity style={styles.mask} activeOpacity={1} onPress={Keyboard.dismiss}>
       <View style={styles.login}>
         <Text style={styles.title}>登录</Text>

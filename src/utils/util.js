@@ -1,3 +1,5 @@
+import Toast from 'react-native-root-toast'
+
 export const noop = () => { }
 
 export const strToDate = dateStr => {
@@ -111,3 +113,5 @@ export class CountDown {
     }
   }
 }
+
+export const toast = Toast.show

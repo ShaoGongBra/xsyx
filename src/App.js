@@ -1,12 +1,19 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Header, Login, Home } from './components'
+import { RootSiblingParent } from 'react-native-root-siblings'
+import { Header, Login, Home, Category } from './components'
+import { codePushHigh, router } from './utils'
 
-const HomeScreen = () => {
-  return <View style={styles.root}>
-    <Header />
-    <Login Home={Home} />
-  </View>
+router.use('Home', Home, { title: '整点秒杀' })
+router.use('Category', Category, { title: '所有商品' })
+
+const App = () => {
+  return <RootSiblingParent>
+    <View style={styles.root}>
+      <Header />
+      <Login />
+    </View>
+  </RootSiblingParent>
 }
 
 const styles = StyleSheet.create({
@@ -16,4 +23,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default HomeScreen
+export default codePushHigh(App)

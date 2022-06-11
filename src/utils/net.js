@@ -1,4 +1,5 @@
 import qs from 'qs'
+import { toast } from './util'
 
 export const request = ({
   demain = 'mall.xsyxsc.com',
@@ -6,24 +7,24 @@ export const request = ({
   protocol = 'https',
   method = 'GET',
   data = {},
-  type = 'json'
+  type = 'json',
+  toast: isToast = true
 }) => {
   const { userInfo = {} } = global
   const { storeInfo = {} } = userInfo
-  url = `${protocol}://${demain}/${url}${method === 'GET' ? '?' + qs.stringify(data) : ''}`
+  method = method.toUpperCase()
   data = {
     clientType: 'MINI_PROGRAM',
     userKey: userInfo.key || '',
     storeId: storeInfo.storeId || '',
     areaId: storeInfo.areaId || '',
-    // provinceCode: storeInfo.provinceId || '',
-    // cityCode: storeInfo.cityId || '',
-    // areaCode: storeInfo.countyId || '',
-
-    // saleRegionCode: storeInfo.areaId || '',
+    provinceCode: storeInfo.provinceId || '',
+    cityCode: storeInfo.cityId || '',
+    areaCode: storeInfo.countyId || '',
+    saleRegionCode: storeInfo.areaId || '',
     ...data
   }
-  method = method.toUpperCase()
+  url = `${protocol}://${demain}/${url}${method === 'GET' ? '?' + qs.stringify(data) : ''}`
   const option = {
     method,
     headers: {
@@ -59,6 +60,9 @@ export const request = ({
       throw res.statusText
     }
   }).catch(err => {
+    if (isToast) {
+      toast(`${typeof isToast === 'string' ? isToast + ': ' : ''}${typeof err === 'object' ? JSON.stringify(err) : err}`)
+    }
     throw err
   })
 }

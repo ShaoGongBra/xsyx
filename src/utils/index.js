@@ -1,3 +1,5 @@
 export * from './net'
 export * from './util'
 export * from './user'
+export * from './codePush'
+export * from './router'

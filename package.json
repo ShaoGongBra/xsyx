@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
+    "codepush": "",
     "test": "jest",
     "lint": "eslint ."
   },
@@ -13,7 +14,9 @@
     "@react-native-async-storage/async-storage": "^1.17.6",
     "qs": "^6.10.5",
     "react": "18.0.0",
-    "react-native": "0.69.0-rc.6"
+    "react-native": "0.69.0-rc.6",
+    "react-native-code-push": "^7.0.4",
+    "react-native-root-toast": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

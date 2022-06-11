@@ -7,12 +7,14 @@ export const getUserInfo = async (userKey = global.userInfo?.key) => {
     demain: 'user.xsyxsc.com',
     url: 'api/member/user/getUserInfo',
     type: 'form',
+    toast: '获取用户信息',
     data: { userKey }
   })
   userInfo.storeInfo = await request({
     demain: 'mall-store.xsyxsc.com',
     url: 'mall-store/store/getStoreInfo',
     type: 'form',
+    toast: '获取自提点信息',
     data: { userKey, storeId: userInfo.currentStoreId }
   })
   return userInfo
