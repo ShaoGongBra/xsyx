@@ -7,6 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "codepush": "",
+    "build:android": "cd android && ./gradlew assembleRelease",
+    "pgyer:android": "duxapp rn pgyer android/app/build/outputs/apk/release/app-arm64-v8a-release.apk",
     "test": "jest",
     "lint": "eslint ."
   },
