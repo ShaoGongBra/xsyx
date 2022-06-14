@@ -3,7 +3,7 @@ import { View, StyleSheet, TextInput, TouchableOpacity, Keyboard } from 'react-n
 import { Text } from './Base'
 import { useUserInfo, request, user, getUserInfo, toast, useRouter } from '../utils'
 
-export const Login = ({ Home, Category }) => {
+export const Login = () => {
 
   const userInfo = useUserInfo()
 
@@ -13,6 +13,16 @@ export const Login = ({ Home, Category }) => {
         user.set(res)
       })
     }
+    request({
+      url: 'user/product/indexWindows',
+      data: {
+        openBrandHouse: 'OPEN'
+      }
+    }).then(res => {
+      console.log('qingqiu',res)
+    }).catch(err => {
+      console.log('shibai',err)
+    })
   }, [userInfo.login])
 
   const [post, setPost] = useState({
@@ -124,6 +134,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     paddingTop: 0,
     paddingBottom: 0,
-    height: 50
+    height: 50,
+    lineHeight: 50,
+    borderWidth: 0,
+    backgroundColor: 'transparent'
   }
 })
