@@ -31,19 +31,23 @@ const Empty = () => {
   return null
 }
 
+const defaultRouter = {
+  name: '',
+  component: Empty,
+  option: {}
+}
+
 export const useRouter = () => {
   const [comp, setComp] = useState(
-    router.routers[router.current] ||
-    {
-      name: '',
-      component: Empty,
-      option: {}
-    }
+    router.routers[router.current] || defaultRouter
   )
 
   useEffect(() => {
     const off = router.onNavigate(data => {
-      setComp(data)
+      if (typeof data === 'object') {
+        console.log('组件更新', typeof data)
+        setComp(data)
+      }
     })
     return () => off()
   }, [])

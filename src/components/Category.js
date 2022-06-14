@@ -5,9 +5,37 @@ import { Text } from './Base'
 import cartImg from '../images/cart.png'
 
 const cartData = {
+  list: [],
   // 更改数量
   num(data) {
-    this.callbacks.forEach(cb => cb('num', data))
+    this.change('num', data)
+  },
+  // 清空
+  clear() {
+    this.change('clear')
+  },
+  change(type, data) {
+    this.list = (() => {
+      if (type === 'num') {
+        const { add, ..._data } = data
+        const index = this.list.findIndex(v => v.ess === data.ess)
+        if (~index) {
+          const item = this.list[index]
+          item.q += add
+          if (!item.q) {
+            // 删除
+            this.list.splice(index, 1)
+          }
+        } else {
+          _data.q = 1
+          this.list.push(_data)
+        }
+        return [...this.list]
+      } else if (type === 'clear') {
+        return []
+      }
+    })()
+    this.callbacks.forEach(cb => cb(this.list))
   },
   callbacks: [],
   onChange(cb) {
@@ -20,17 +48,13 @@ const cartData = {
 
 const useCart = () => {
 
-  const [cart, setCart] = useState([])
+  const [cart, setCart] = useState(cartData.list)
 
   useEffect(() => {
-    const off = cartData.onChange((type, data) => {
-      setCart(old => {
-        if (type === num) {
-          const item = old.find(v => v.ess === data.ess)
-        } else {
-          
-        }
-      })
+    const off = cartData.onChange(data => {
+      if (typeof data === 'object') {
+        setCart(data)
+      }
     })
     return () => off()
   }, [])
@@ -51,15 +75,14 @@ const Item = ({
   prId,
   prType,
   eskuSn,
-  onAdd,
   cart
 }) => {
 
   const addCart = useCallback(() => {
-    onAdd?.({
+    cartData.num({
       title: prName,
       pai: acId,
-      q: 1,
+      add: 1,
       sku,
       pi: prId,
       pt: prType,
@@ -80,7 +103,7 @@ const Item = ({
         eskuSn
       }
     })
-  }, [acId, sku, prType, eskuSn, ulimitQty, onAdd])
+  }, [acId, sku, prType, eskuSn, ulimitQty])
 
   const cartNum = useMemo(() => {
     return cart.find(item => item.ess === eskuSn)?.q || 0
@@ -93,7 +116,7 @@ const Item = ({
       <View style={styles.goodsBottom}>
         <Text style={styles.goodsPrice}><Text style={[styles.goodsPrice, { fontSize: 18 }]}>￥</Text>{saleAmt}</Text>
         <TouchableOpacity style={styles.goodsBuy} activeOpacity={0.7} onPress={addCart}>
-          {cartNum > 0 && <View style={styles.goodsBuyChild} />}
+          {cartNum > 0 && <Text style={styles.goodsBuyChild}>{cartNum}</Text>}
         </TouchableOpacity>
       </View>
     </View>
@@ -111,7 +134,7 @@ export const Category = () => {
 
   const [list, setList] = useState([])
 
-  const [cart, setCart] = useState([])
+  const cart = useCart()
 
   useEffect(() => {
     request({
@@ -179,18 +202,6 @@ export const Category = () => {
     getList(cates[cateSelect].id)
   }, [cates, cateSelect, getList])
 
-  const addCart = useCallback(data => {
-    setCart(old => {
-      const index = old.findIndex(item => item.ess === data.ess)
-      if (~index) {
-        old.splice(index, 1)
-      } else {
-        old.push(data)
-      }
-      return [...old]
-    })
-  }, [])
-
   return <>
     <SafeAreaView style={styles.container}>
       <View style={styles.lists}>
@@ -208,18 +219,18 @@ export const Category = () => {
           <FlatList
             data={list}
             keyExtractor={item => item.prName}
-            renderItem={({ item }) => <Item {...item} cart={cart} onAdd={addCart} />}
+            renderItem={({ item }) => <Item {...item} cart={cart} />}
           />
         </View>
       </View>
-      <Cart list={cart} />
+      <Cart />
     </SafeAreaView>
   </>
 }
 
-const Cart = ({
-  list
-}) => {
+const Cart = () => {
+
+  const list = useCart()
 
   const total = useMemo(() => {
     return list.reduce((prev, current) => {
@@ -270,13 +281,13 @@ const Cart = ({
       toast('购买成功 请在10分钟内前往小程序支付')
     }).finally(() => {
       // 删除购物车数据
-      setCart(list.filter(item => item.tmBuyStart !== time))
+
     })
   }, [list])
 
   return <>
     <View style={styles.cart}>
-      <Text style={styles.cartPrice}><Text style={styles.cartPriceChild}>￥</Text>{total.price}</Text>
+      <Text style={styles.cartPrice}><Text style={styles.cartPriceChild}>￥</Text>{total.price.toFixed(2)}</Text>
       <TouchableOpacity activeOpacity={1} style={styles.cartSubmit} onPress={buy}>
         <Text style={styles.cartSubmitText}>提交订单</Text>
       </TouchableOpacity>
@@ -354,10 +365,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   goodsBuyChild: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#d53120'
+    fontSize: 14,
+    color: '#d53120'
   },
   goodsTips: {
     position: 'absolute',

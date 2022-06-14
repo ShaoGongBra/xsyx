@@ -13,16 +13,6 @@ export const Login = () => {
         user.set(res)
       })
     }
-    request({
-      url: 'user/product/indexWindows',
-      data: {
-        openBrandHouse: 'OPEN'
-      }
-    }).then(res => {
-      console.log('qingqiu',res)
-    }).catch(err => {
-      console.log('shibai',err)
-    })
   }, [userInfo.login])
 
   const [post, setPost] = useState({
@@ -95,7 +85,7 @@ export const Login = () => {
   const { component: Page } = useRouter()
 
   return userInfo.login ?
-    <Page /> :
+    (Page ? <Page /> : null) :
     <TouchableOpacity style={styles.mask} activeOpacity={1} onPress={Keyboard.dismiss}>
       <View style={styles.login}>
         <Text style={styles.title}>登录</Text>
