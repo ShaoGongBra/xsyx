@@ -136,9 +136,8 @@ export const Home = () => {
           pageSize: 20
         }
       }).then(res => cate[index].data = res.cmsActivityColumnProductInfos)))
-    }).then(res => {
+    }).then(() => {
       setList(cate)
-      console.log(JSON.stringify(cate, null, 2))
     }).finally(() => {
       setRefresh(false)
     })
@@ -216,7 +215,7 @@ export const Home = () => {
       onRefresh={getData}
       refreshing={refresh}
       sections={list}
-      keyExtractor={item => item.id}
+      keyExtractor={item => item.sku}
       renderItem={({ item }) => <Item {...item} cart={cart} onAdd={addCart} />}
       renderSectionHeader={({ section }) => <Title
         title={section.startTime.substr(5, 11)}
