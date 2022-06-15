@@ -13,6 +13,36 @@ export const asyncTimeOut = time => {
   })
 }
 
+export const strFormatToDate = (formatStr, dateStr) => {
+  let year = 0
+  let start = -1
+  const len = dateStr.length
+  if ((start = formatStr.indexOf('yyyy')) > -1 && start < len) {
+    year = dateStr.substr(start, 4)
+  }
+  let month = 0
+  if ((start = formatStr.indexOf('MM')) > -1 && start < len) {
+    month = parseInt(dateStr.substr(start, 2)) - 1
+  }
+  let day = 0
+  if ((start = formatStr.indexOf('dd')) > -1 && start < len) {
+    day = parseInt(dateStr.substr(start, 2))
+  }
+  let hour = 0
+  if (((start = formatStr.indexOf('HH')) > -1 || (start = formatStr.indexOf('hh')) > 1) && start < len) {
+    hour = parseInt(dateStr.substr(start, 2))
+  }
+  let minute = 0
+  if ((start = formatStr.indexOf('mm')) > -1 && start < len) {
+    minute = dateStr.substr(start, 2)
+  }
+  let second = 0
+  if ((start = formatStr.indexOf('ss')) > -1 && start < len) {
+    second = dateStr.substr(start, 2)
+  }
+  return new Date(year, month, day, hour, minute, second)
+}
+
 export const endTime = (time, formatStr = 'd天H时M分S秒', isEndTime = false, getAll = false) => {
   if (isEndTime) {
     time = (time - (new Date()).getTime())

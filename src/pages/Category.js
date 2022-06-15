@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { View, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity } from 'react-native'
-import { request, toast } from '../utils'
-import { Text } from './Base'
+import { View, StyleSheet, FlatList, SectionList, SafeAreaView, Image, TouchableOpacity } from 'react-native'
+import { request, goodsBuy, strFormatToDate } from '../utils'
+import { Text, GoodsDetail, PullView } from '../components'
 import cartImg from '../images/cart.png'
 
 const cartData = {
@@ -11,8 +11,8 @@ const cartData = {
     this.change('num', data)
   },
   // 清空
-  clear() {
-    this.change('clear')
+  clear(data) {
+    this.change('clear', data)
   },
   change(type, data) {
     this.list = (() => {
@@ -32,7 +32,14 @@ const cartData = {
         }
         return [...this.list]
       } else if (type === 'clear') {
-        return []
+        if (data) {
+          data.forEach(ess => {
+            this.list.splice(this.list.findIndex(v => v.ess === ess), 1)
+          })
+          return [...this.list]
+        } else {
+          return []
+        }
       }
     })()
     this.callbacks.forEach(cb => cb(this.list))
@@ -70,19 +77,22 @@ const Item = ({
   ulimitQty,
   verificationCode,
   tmBuyStart,
+  tmBuyEnd,
   acId,
   sku,
   prId,
   prType,
   eskuSn,
-  cart
+  cart,
+  showAll,
+  onPress
 }) => {
 
-  const addCart = useCallback(() => {
+  const addCart = useCallback(add => {
     cartData.num({
       title: prName,
       pai: acId,
-      add: 1,
+      add,
       sku,
       pi: prId,
       pt: prType,
@@ -96,6 +106,7 @@ const Item = ({
         ulimitQty,
         verificationCode,
         tmBuyStart,
+        tmBuyEnd,
         acId,
         sku,
         prId,
@@ -105,28 +116,46 @@ const Item = ({
     })
   }, [acId, sku, prType, eskuSn, ulimitQty])
 
+  const add = useCallback(() => addCart(1), [addCart])
+
+  const reduce = useCallback(() => addCart(-1), [addCart])
+
   const cartNum = useMemo(() => {
     return cart.find(item => item.ess === eskuSn)?.q || 0
   }, [cart, eskuSn])
 
-  return <View style={styles.goods}>
+  const click = useCallback(() => {
+    // onPress?.(detailUrls)
+  }, [])
+
+  return <TouchableOpacity activeOpacity={1} style={styles.goods} onPress={click}>
     <Image style={styles.goodsImage} resizeMethod='resize' source={{ uri: imgUrl }} />
     <View style={styles.goodsInfo}>
-      <Text style={styles.goodsName}>{prName} 限购{ulimitQty}{salesUnit}</Text>
+      <Text style={styles.goodsName}>{prName}{ulimitQty ? ` 限购${ulimitQty}${salesUnit}` : ''}</Text>
       <View style={styles.goodsBottom}>
         <Text style={styles.goodsPrice}><Text style={[styles.goodsPrice, { fontSize: 18 }]}>￥</Text>{saleAmt}</Text>
-        <TouchableOpacity style={styles.goodsBuy} activeOpacity={0.7} onPress={addCart}>
-          {cartNum > 0 && <Text style={styles.goodsBuyChild}>{cartNum}</Text>}
-        </TouchableOpacity>
+        {
+          showAll ?
+            <View style={styles.goodsBuys}>
+              <Text style={styles.goodsBuysAdd} onPress={reduce}>-</Text>
+              <Text style={styles.goodsBuysNum}>{cartNum}</Text>
+              <Text style={styles.goodsBuysAdd} onPress={add}>+</Text>
+            </View> :
+            <TouchableOpacity style={styles.goodsBuy} activeOpacity={0.7} onPress={add}>
+              {cartNum > 0 && <Text style={styles.goodsBuyChild}>{cartNum}</Text>}
+            </TouchableOpacity>
+        }
       </View>
     </View>
     <View style={styles.goodsTips}>
       {verificationCode && <Text style={styles.goodsTipsCode}>验证码</Text>}
     </View>
-  </View>
+  </TouchableOpacity>
 }
 
 export const Category = () => {
+
+  const detail = useRef(null)
 
   const [cates, setCates] = useState([])
 
@@ -191,7 +220,16 @@ export const Category = () => {
     }
     const malls = []
     getMalls(malls).then(() => {
-      setList(malls)
+      const arr = {}
+      malls.forEach(item => {
+        const key = item.tmBuyStart
+        arr[key] = arr[key] || {
+          title: key,
+          data: []
+        }
+        arr[key].data.push(item)
+      })
+      setList(Object.values(arr).sort((a, b) => strFormatToDate('yyyy-MM-dd HH:mm:ss', a.title) - strFormatToDate('yyyy-MM-dd HH:mm:ss', b.title)))
     })
   }, [])
 
@@ -201,6 +239,10 @@ export const Category = () => {
     }
     getList(cates[cateSelect].id)
   }, [cates, cateSelect, getList])
+
+  const showDetail = useCallback(list => {
+    detail.current.show(list)
+  }, [])
 
   return <>
     <SafeAreaView style={styles.container}>
@@ -216,74 +258,45 @@ export const Category = () => {
           />
         </View>
         <View style={styles.list}>
-          <FlatList
-            data={list}
+          <SectionList
+            sections={list}
             keyExtractor={item => item.prName}
-            renderItem={({ item }) => <Item {...item} cart={cart} />}
+            renderItem={({ item }) => <Item {...item} cart={cart} onPress={showDetail} />}
+            renderSectionHeader={({ section }) => <Text style={styles.listTime}>{section.title.substr(5, 11)}</Text>}
           />
         </View>
       </View>
-      <Cart />
     </SafeAreaView>
+    <Cart />
+    <GoodsDetail ref={detail} />
   </>
 }
 
 const Cart = () => {
 
-  const list = useCart()
+  const [show, setShow] = useState(false)
+
+  const cart = useCart()
 
   const total = useMemo(() => {
-    return list.reduce((prev, current) => {
+    return cart.reduce((prev, current) => {
       prev.count += current.q
       prev.price += current.q * current.other.saleAmt
       return prev
     }, { count: 0, price: 0 })
-  }, [list])
+  }, [cart])
 
-  const buy = useCallback(time => {
+  const buy = useCallback(() => {
     // 找到要提交的商品
-    const itemList = list.filter(item => item.tmBuyStart === time).map(({ tmBuyStart, ...item }) => item)
+
+    const itemList = cart.filter(item => strFormatToDate('yyyy-MM-dd HH:mm:ss', item.other.tmBuyStart) < new Date()).map(({ other, ...item }) => item)
     if (!itemList.length) {
       return
     }
+    goodsBuy(itemList).then(() => cartData.clear(itemList.map(v => v.ess)))
+  }, [cart])
 
-    const { userInfo = {} } = global
-    const { storeInfo = {} } = userInfo
-
-    const data = {
-      order: JSON.stringify({
-        ai: storeInfo.areaId,
-        ct: 'MINI_PROGRAM',
-        ot: 'CHOICE',
-        iv: 0,
-        // 下面三个是用户信息
-        un: userInfo.userName,
-        wn: userInfo.nickName,
-        wi: userInfo.headImgUrl,
-        // 下面是收货人
-        p: userInfo.mobileNo,
-        r: userInfo.nickName,
-        si: storeInfo.storeId,
-        // 商品列表
-        itemList,
-        // 验证码
-        tk: '',
-      })
-    }
-
-    request({
-      demain: 'trade.xsyxsc.com',
-      url: 'tradeorder/order/create',
-      method: 'POST',
-      type: 'form',
-      data
-    }).then(() => {
-      toast('购买成功 请在10分钟内前往小程序支付')
-    }).finally(() => {
-      // 删除购物车数据
-
-    })
-  }, [list])
+  const changeShow = useCallback(() => setShow(old => !old), [])
 
   return <>
     <View style={styles.cart}>
@@ -292,13 +305,51 @@ const Cart = () => {
         <Text style={styles.cartSubmitText}>提交订单</Text>
       </TouchableOpacity>
     </View>
-    <View style={styles.cartIcon}>
+    <TouchableOpacity activeOpacity={1} style={styles.cartIcon} onPress={changeShow}>
       <Image style={styles.cartIconImg} source={cartImg} />
       {total.count > 0 && <View style={styles.cartIconNum}>
         <Text>{total.count}</Text>
       </View>}
-    </View>
+    </TouchableOpacity>
+    <CartList cart={cart} show={show} onClose={changeShow} />
   </>
+}
+
+const CartList = ({
+  show,
+  cart,
+  onClose
+}) => {
+
+  const [list, setList] = useState([])
+
+  useEffect(() => {
+    const arr = {}
+    cart.forEach(item => {
+      const key = item.other.tmBuyStart
+      arr[key] = arr[key] || {
+        title: key,
+        data: []
+      }
+      arr[key].data.push(item.other)
+    })
+    setList(Object.values(arr).sort((a, b) => strFormatToDate('yyyy-MM-dd HH:mm:ss', a.title) - strFormatToDate('yyyy-MM-dd HH:mm:ss', b.title)))
+  }, [cart])
+
+  return show && <PullView onClose={onClose}>
+    <View style={styles.cartList}>
+      <View style={styles.cartListTitle}>
+        <Text style={styles.cartListTitleText}>购物车</Text>
+      </View>
+      <SectionList
+        sections={list}
+        style={{ height: 500, paddingHorizontal: 10 }}
+        keyExtractor={item => item.prName}
+        renderItem={({ item }) => <Item {...item} cart={cart} showAll />}
+        renderSectionHeader={({ section }) => <Text style={styles.listTime}>{section.title.substr(5, 11)}</Text>}
+      />
+    </View>
+  </PullView>
 }
 
 const styles = StyleSheet.create({
@@ -325,6 +376,11 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
     paddingHorizontal: 10
+  },
+  listTime: {
+    paddingVertical: 10,
+    fontSize: 24,
+    fontWeight: 'bold'
   },
   goods: {
     backgroundColor: '#2c2a2d',
@@ -355,6 +411,10 @@ const styles = StyleSheet.create({
     color: '#d53120',
     fontWeight: 'bold'
   },
+  goodsBuys: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
   goodsBuy: {
     width: 26,
     height: 26,
@@ -363,6 +423,16 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  goodsBuysNum: {
+    fontSize: 14,
+    color: '#d53120',
+    paddingHorizontal: 10
+  },
+  goodsBuysAdd: {
+    fontSize: 24,
+    color: '#ccc',
+    padding: 5
   },
   goodsBuyChild: {
     fontSize: 14,
@@ -430,5 +500,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12
+  },
+  cartList: {
+    backgroundColor: '#404040',
+    height: 520
+  },
+  cartListTitle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#2c2a2d',
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    overflow: 'hidden'
+  },
+  cartListContent: {
+    height: 500
   }
 })

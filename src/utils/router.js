@@ -45,7 +45,6 @@ export const useRouter = () => {
   useEffect(() => {
     const off = router.onNavigate(data => {
       if (typeof data === 'object') {
-        console.log('组件更新', typeof data)
         setComp(data)
       }
     })

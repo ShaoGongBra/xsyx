@@ -112,11 +112,11 @@ const Menu = ({
       <Image style={styles.menuUserHead} source={{ uri: userInfo.headImgUrl }} />
       <View style={styles.menuUserRight}>
         <Text style={styles.menuUserName}>{userInfo.nickName}</Text>
-        <Text style={styles.menuUserStore}>{userInfo.storeInfo.storeName}</Text>
+        <Text style={styles.menuUserStore}>{userInfo.storeInfo?.storeName}</Text>
       </View>
     </View>
     {
-      routers.map(item => <TouchableOpacity activeOpacity={0.7} onPress={() => {
+      routers.map(item => <TouchableOpacity key={item.name} activeOpacity={0.7} onPress={() => {
         router.navigate(item.name)
         onClose()
       }} style={[styles.menuItem, routerName === item.name && styles.menuItemSelect]}>

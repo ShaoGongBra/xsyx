@@ -1,7 +1,8 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { RootSiblingParent } from 'react-native-root-siblings'
-import { Header, Login, Home, Category } from './components'
+import { Header, Login } from './components'
+import { Home, Category } from './pages'
 import { codePushHigh, router } from './utils'
 
 router.use('Home', Home, { title: '整点秒杀' })

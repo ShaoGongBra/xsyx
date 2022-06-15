@@ -85,7 +85,7 @@ export const Login = () => {
   const { component: Page } = useRouter()
 
   return userInfo.login ?
-    (Page ? <Page /> : null) :
+    <Page /> :
     <TouchableOpacity style={styles.mask} activeOpacity={1} onPress={Keyboard.dismiss}>
       <View style={styles.login}>
         <Text style={styles.title}>登录</Text>
@@ -125,7 +125,6 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     paddingBottom: 0,
     height: 50,
-    lineHeight: 50,
     borderWidth: 0,
     backgroundColor: 'transparent'
   }

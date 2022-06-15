@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, SectionList, SafeAreaView, Image, TouchableOpacity } from 'react-native'
-import { request, strToDate, CountDown, toast } from '../utils'
-import { Text } from './Base'
+import { request, strToDate, CountDown, goodsBuy } from '../utils'
+import { Text, GoodsDetail } from '../components'
 
 const Title = ({
   title,
@@ -44,6 +44,7 @@ const Item = ({
   saleAmt,
   salesUnit,
   ulimitQty,
+  limitQty,
   marketingDataDto,
   verificationCode,
   tmBuyStart,
@@ -53,7 +54,9 @@ const Item = ({
   prType,
   eskuSn,
   onAdd,
-  cart
+  cart,
+  detailUrls,
+  onPress
 }) => {
 
   const addCart = useCallback(() => {
@@ -77,13 +80,17 @@ const Item = ({
     return cart.some(item => item.ess === eskuSn)
   }, [marketingDataDto.saleRemain, cart, eskuSn])
 
-  return <View style={styles.goods}>
+  const click = useCallback(() => {
+    onPress?.(detailUrls)
+  }, [detailUrls])
+
+  return <TouchableOpacity activeOpacity={1} style={styles.goods} onPress={click}>
     <Image style={styles.goodsImage} source={{ uri: imgUrl }} />
     <View style={styles.goodsInfo}>
       <Text style={styles.goodsName}>{prName} 限购{ulimitQty}{salesUnit}</Text>
       <View style={styles.goodsSale}>
-        <View style={[{ width: marketingDataDto.consumerNum / (marketingDataDto.saleRemain + marketingDataDto.consumerNum) * 100 + '%' }, styles.goodsSaleChild]} />
-        <Text style={styles.goodsSaleText}>{marketingDataDto.consumerNum}/{marketingDataDto.saleRemain + marketingDataDto.consumerNum}</Text>
+        <View style={[{ width: marketingDataDto.consumerNum / limitQty * 100 + '%' }, styles.goodsSaleChild]} />
+        <Text style={styles.goodsSaleText}>{marketingDataDto.consumerNum}/{limitQty}</Text>
       </View>
       <View style={styles.goodsBottom}>
         <Text style={styles.goodsPrice}><Text style={[styles.goodsPrice, { fontSize: 18 }]}>￥</Text>{saleAmt}</Text>
@@ -99,10 +106,12 @@ const Item = ({
     <View style={styles.goodsTips}>
       {verificationCode && <Text style={styles.goodsTipsCode}>验证码</Text>}
     </View>
-  </View>
+  </TouchableOpacity>
 }
 
 export const Home = () => {
+
+  const detail = useRef(null)
 
   const [list, setList] = useState([])
 
@@ -152,6 +161,10 @@ export const Home = () => {
     setTimers(Object.fromEntries(cart.map(item => [item.tmBuyStart, item.tmBuyStart])))
   }, [cart, list])
 
+  const showDetail = useCallback(list => {
+    detail.current.show(list)
+  }, [])
+
   const addCart = useCallback(data => {
     setCart(old => {
       const index = old.findIndex(item => item.ess === data.ess)
@@ -171,59 +184,30 @@ export const Home = () => {
       return
     }
 
-    const { userInfo = {} } = global
-    const { storeInfo = {} } = userInfo
-
-    const data = {
-      order: JSON.stringify({
-        ai: storeInfo.areaId,
-        ct: 'MINI_PROGRAM',
-        ot: 'CHOICE',
-        iv: 0,
-        // 下面三个是用户信息
-        un: userInfo.userName,
-        wn: userInfo.nickName,
-        wi: userInfo.headImgUrl,
-        // 下面是收货人
-        p: userInfo.mobileNo,
-        r: userInfo.nickName,
-        si: storeInfo.storeId,
-        // 商品列表
-        itemList,
-        // 验证码
-        tk: '',
-      })
-    }
-
-    request({
-      demain: 'trade.xsyxsc.com',
-      url: 'tradeorder/order/create',
-      method: 'POST',
-      type: 'form',
-      data
-    }).then(() => {
-      toast('购买成功 请在10分钟内前往小程序支付')
+    goodsBuy(itemList).then(() => {
       getData()
     }).finally(() => {
-      // 删除购物车数据
       setCart(cart.filter(item => item.tmBuyStart !== time))
     })
   }, [cart, getData])
 
-  return <SafeAreaView style={styles.container}>
-    <SectionList
-      onRefresh={getData}
-      refreshing={refresh}
-      sections={list}
-      keyExtractor={item => item.sku}
-      renderItem={({ item }) => <Item {...item} cart={cart} onAdd={addCart} />}
-      renderSectionHeader={({ section }) => <Title
-        title={section.startTime.substr(5, 11)}
-        startTime={timers[section.startTime]}
-        onTimeEnd={buy}
-      />}
-    />
-  </SafeAreaView>
+  return <>
+    <SafeAreaView style={styles.container}>
+      <SectionList
+        onRefresh={getData}
+        refreshing={refresh}
+        sections={list}
+        keyExtractor={item => item.sku}
+        renderItem={({ item }) => <Item onPress={showDetail} {...item} cart={cart} onAdd={addCart} />}
+        renderSectionHeader={({ section }) => <Title
+          title={section.startTime.substr(5, 11)}
+          startTime={timers[section.startTime]}
+          onTimeEnd={buy}
+        />}
+      />
+    </SafeAreaView>
+    <GoodsDetail ref={detail} />
+  </>
 }
 
 const styles = StyleSheet.create({
