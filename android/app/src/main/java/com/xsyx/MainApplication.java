@@ -11,8 +11,6 @@ import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
 import com.xsyx.newarchitecture.MainApplicationReactNativeHost;
 
-import com.microsoft.codepush.react.CodePush;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -39,10 +37,6 @@ public class MainApplication extends Application implements ReactApplication {
           return "index";
         }
 
-        @Override
-        protected String getJSBundleFile() {
-          return CodePush.getJSBundleFile();
-        }
       };
 
   private final ReactNativeHost mNewArchitectureNativeHost =

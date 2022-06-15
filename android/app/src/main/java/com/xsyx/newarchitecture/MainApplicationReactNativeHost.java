@@ -19,6 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
+
+import com.microsoft.codepush.react.CodePush;
+
 import com.xsyx.BuildConfig;
 import com.xsyx.newarchitecture.components.MainComponentsRegistry;
 import com.xsyx.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
@@ -57,6 +60,11 @@ public class MainApplicationReactNativeHost extends ReactNativeHost {
   @Override
   protected String getJSMainModuleName() {
     return "index";
+  }
+
+  @Override
+  protected String getJSBundleFile() {
+    return CodePush.getJSBundleFile();
   }
 
   @NonNull

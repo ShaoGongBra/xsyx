@@ -70,7 +70,7 @@ export const Header = () => {
           <Image style={styles.headerLeftMenu} source={menuImg} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.headerTitle}>兴盛优选</Text>
+      <Text style={styles.headerTitle}>优选</Text>
       <View style={styles.headerRight}>
         <Image style={styles.headerUser} source={{ uri: userInfo.headImgUrl }} />
       </View>
@@ -125,7 +125,7 @@ const Menu = ({
     }
     <TouchableOpacity activeOpacity={0.7} style={styles.menuItem} onPress={updateApp}>
       <Text style={styles.menuItemName}>版本更新</Text>
-      <Text style={styles.menuItemDesc}>{codepushVersion}</Text>
+      <Text style={styles.menuItemDesc}>v{codepushVersion}</Text>
     </TouchableOpacity>
     <TouchableOpacity activeOpacity={0.7} style={styles.menuItem} onPress={onOut}>
       <Text style={styles.menuItemName}>退出登录</Text>

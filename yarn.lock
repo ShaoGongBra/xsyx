@@ -2988,10 +2988,10 @@ domexception@^2.0.1:
   dependencies:
     webidl-conversions "^5.0.0"
 
-duxapp-cli@^1.0.61:
-  version "1.0.61"
-  resolved "https://registry.yarnpkg.com/duxapp-cli/-/duxapp-cli-1.0.61.tgz#241b2807912d496e54b8484054ca1ebf60854767"
-  integrity sha512-Huuag99Xm6HzncY03xbooBJrKdPSLM6aIQdbougAZH+bzu0egXnVPjFLkzVASpZRur/99hZSV6DWlsIZzunp6Q==
+duxapp-cli@^1.0.62:
+  version "1.0.62"
+  resolved "https://registry.yarnpkg.com/duxapp-cli/-/duxapp-cli-1.0.62.tgz#6800e760942c35094294b68abe9195094d46559e"
+  integrity sha512-v8horJZqVzkNeJVP7JUFCCXxVki3/QBv5Rrb+iPW5IJMFPShSGNssK2yOBeG96x6wZhocJ2+ehVZradW3DfF5w==
   dependencies:
     inquirer "^8.2.0"
     node-stream-zip "^1.15.0"
@@ -5444,7 +5444,7 @@ metro-cache@0.70.3:
     metro-core "0.70.3"
     rimraf "^2.5.4"
 
-metro-config@0.70.3, metro-config@^0.70.1:
+metro-config@0.70.3, metro-config@^0.70.1, metro-config@^0.70.3:
   version "0.70.3"
   resolved "https://registry.yarnpkg.com/metro-config/-/metro-config-0.70.3.tgz#fe6f7330f679d5594e5724af7a69d4dbe1bb5bc3"
   integrity sha512-SSCDjSTygoCgzoj61DdrBeJzZDRwQxUEfcgc6t6coxWSExXNR4mOngz0q4SAam49Bmjq9J2Jft6qUKnUTPrRgA==

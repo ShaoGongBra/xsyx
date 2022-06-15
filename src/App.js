@@ -2,11 +2,12 @@ import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import { Header, Login } from './components'
-import { Home, Category } from './pages'
+import { Home, Category, Config } from './pages'
 import { codePushHigh, router } from './utils'
 
 router.use('Home', Home, { title: '整点秒杀' })
 router.use('Category', Category, { title: '所有商品' })
+router.use('Config', Config, { title: '设置' })
 
 const App = () => {
   return <RootSiblingParent>
